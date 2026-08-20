@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>国风知识卡片 · 智能体</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- 顶部状态栏 -->
+  <div class="statusbar">
+    <div class="sb-left">
+      <span class="sb-ic">🏮</span>
+      <span class="sb-title">国风知识卡片</span>
+    </div>
+    <button class="set-btn" id="setBtn" title="设置模型">⚙</button>
+  </div>
+
+  <!-- 主内容 -->
+  <div class="content">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-ic">🖌️📜</div>
+      <div class="hero-t">输入一个知识点，生成一幅中国风知识卡片！</div>
+      <div class="hero-s">适合中小学同学的「国风传统主题」小助手<br>宣纸为底、朱印落款、AI 国风插画，可自己换大模型 / 画图模型 🎨</div>
+    </div>
+
+    <!-- ① 主题输入 -->
+    <div class="card">
+      <div class="card-h"><b>①</b> 想学什么知识点？</div>
+      <label class="lbl">知识点名称</label>
+      <textarea class="field area" id="topic" rows="2" placeholder="例如：二十四节气 / 文房四宝 / 勾股定理 / 丝绸之路 / 春节"></textarea>
+
+      <div class="chips" id="chips">
+        <span class="chip" data-t="二十四节气">二十四节气</span>
+        <span class="chip" data-t="文房四宝">文房四宝</span>
+        <span class="chip" data-t="勾股定理">勾股定理</span>
+        <span class="chip" data-t="丝绸之路">丝绸之路</span>
+        <span class="chip" data-t="春节">春节</span>
+        <span class="chip" data-t="京剧">京剧</span>
+      </div>
+
+      <div class="field-gap"></div>
+      <label class="lbl">学段（决定语言深浅）</label>
+      <div class="seg" id="grade">
+        <button class="seg-btn" data-v="小学">小学</button>
+        <button class="seg-btn active" data-v="初中">初中</button>
+        <button class="seg-btn" data-v="高中">高中</button>
+      </div>
+
+      <div class="field-gap"></div>
+      <label class="lbl">插画方式</label>
+      <div class="seg" id="mode">
+        <button class="seg-btn active" data-v="svg">🏞 国风简笔（免费·免配图）</button>
+        <button class="seg-btn" data-v="image">🤖 AI 国风插画（需配图模型）</button>
+      </div>
+      <div class="tip" id="modeTip">简笔模式用内置国风占位插画，秒出图、零成本、永远能渲染。想用 AI 生成真正的国风插画请在右上角 ⚙ 配置「图模型」。</div>
+    </div>
+
+    <!-- ② 生成进度 -->
+    <div class="card">
+      <div class="card-h"><b>②</b> 生成进度</div>
+      <div class="pbar"><i id="pbar" style="width:0%"></i></div>
+      <div class="step-label" id="stepLabel">还没开始～</div>
+      <div class="logbox" id="log"><span class="empty">等待生成…</span></div>
+    </div>
+
+    <!-- ③ 结果 -->
+    <div class="card">
+      <div class="card-h"><b>③</b> 成品预览</div>
+      <div id="resultEmpty" class="empty">生成完成后，这里会显示卡片 👇</div>
+      <iframe id="preview" class="preview hidden" title="卡片预览"></iframe>
+      <div class="result-btns hidden" id="resultBtns">
+        <button class="btn-ghost" id="dlBtn">⬇ 下载 HTML</button>
+        <button class="btn-ghost" id="newBtn">↗ 新窗口打开</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 底部操作栏 -->
+  <div class="footer-bar">
+    <button class="btn-ghost" id="clearBtn">清空</button>
+    <button class="btn-main" id="genBtn">🚀 开始生成</button>
+  </div>
+
+  <!-- 设置弹窗 -->
+  <div class="set-overlay" id="setOverlay">
+    <div class="set-panel">
+      <div class="set-head">
+        <span>⚙ 模型设置</span>
+        <button class="set-x" id="setX">✕</button>
+      </div>
+      <div class="set-tip">配置「自己的大模型 / 画图模型」，地址需为 OpenAI 兼容格式（以 <code>/v1</code> 结尾最好）。配置仅保存在本机 <code>.env</code> 文件。</div>
+
+      <div class="set-group-title">🧠 语言大模型（LLM）</div>
+      <div class="key-row">
+        <label>服务商（常用网址一键填）</label>
+        <select class="field" id="llm_provider">
+          <option value="custom">自定义 / 其它</option>
+          <option value="openai">OpenAI</option>
+          <option value="deepseek">DeepSeek 深度求索</option>
+          <option value="dashscope">通义千问（阿里）</option>
+          <option value="zhipu">智谱 GLM（清华）</option>
+          <option value="moonshot">Kimi 月之暗面</option>
+          <option value="siliconflow">硅基流动 SiliconFlow</option>
+          <option value="volcengine">火山方舟 / 豆包（字节）</option>
+          <option value="hunyuan">腾讯混元</option>
+          <option value="ollama">Ollama（本机本地）</option>
+        </select>
+      </div>
+      <a class="key-link" id="llmKeyLink" target="_blank" rel="noopener" style="display:none"></a>
+      <div class="key-row"><label>模型地址 (Base URL)</label><input class="field" id="llm_base" placeholder="https://api.openai.com/v1"></div>
+      <div class="key-row"><label>API Key</label><input class="field" id="llm_key" placeholder="sk-..." type="password"></div>
+      <div class="key-row"><label>模型名 (Model)</label><input class="field" id="llm_model" placeholder="gpt-4o-mini / deepseek-chat ..."></div>
+
+      <div class="set-group-title">🎨 图像模型（可选）</div>
+      <div class="key-row">
+        <label>服务商（常用网址一键填）</label>
+        <select class="field" id="img_provider">
+          <option value="custom">自定义 / 其它</option>
+          <option value="openai">OpenAI（DALL·E / gpt-image-1）</option>
+          <option value="siliconflow">硅基流动 SiliconFlow</option>
+          <option value="dashscope">通义万相（阿里）</option>
+          <option value="volcengine">火山方舟（字节）</option>
+        </select>
+      </div>
+      <a class="key-link" id="imgKeyLink" target="_blank" rel="noopener" style="display:none"></a>
+      <div class="key-row"><label>模型地址 (Base URL)</label><input class="field" id="img_base" placeholder="https://api.openai.com/v1"></div>
+      <div class="key-row"><label>API Key</label><input class="field" id="img_key" placeholder="sk-..." type="password"></div>
+      <div class="key-row"><label>模型名 (Model)</label><input class="field" id="img_model" placeholder="dall-e-3 / gpt-image-1 ..."></div>
+      <div class="key-row"><label>图片尺寸 (Size)</label><input class="field" id="img_size" placeholder="1024x1024"></div>
+      <button class="btn-ghost" id="testImgBtn" style="margin-top:10px;">测试图像模型连通</button>
+
+      <div class="set-foot">
+        <button class="btn-ghost" id="testBtn" style="margin-bottom:10px;">测试 LLM 连通</button>
+        <button class="btn-main" id="saveBtn">保存设置</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
