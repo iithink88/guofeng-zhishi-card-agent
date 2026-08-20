@@ -1,0 +1,13 @@
+Windows Registry Editor Version 5.00
+
+; 把 .bat 文件关联恢复为系统默认（cmd 直接执行）
+; 双击本文件后点“是/确定”，需要管理员权限
+
+[HKEY_CLASSES_ROOT\.bat]
+@="batfile"
+
+[HKEY_CLASSES_ROOT\batfile]
+@="Windows 批处理文件"
+
+[HKEY_CLASSES_ROOT\batfile\shell\open\command]
+@="\"%1\" %*"
